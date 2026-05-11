@@ -6,3 +6,4 @@ numpy==1.26.4
 pillow==10.2.0
 gunicorn==21.2.0
 h5py==3.12.1
+python-3.10.13
