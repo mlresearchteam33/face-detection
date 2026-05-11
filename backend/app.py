@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, render_template
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 import pickle
 import numpy as np
 from PIL import Image
@@ -16,8 +16,14 @@ app = Flask(
     template_folder="../"
 )
 
-# Enable CORS
-CORS(app)
+# =========================
+# ENABLE CORS
+# =========================
+
+CORS(
+    app,
+    resources={r"/*": {"origins": "*"}}
+)
 
 # =========================
 # LOAD MODEL
@@ -53,6 +59,7 @@ def home():
 # =========================
 
 @app.route("/predict", methods=["POST"])
+@cross_origin()
 def predict():
 
     try:
