@@ -2,7 +2,7 @@ flask==3.0.2
 flask-cors==4.0.0
 numpy==1.26.4
 pillow==10.0.1
-tensorflow-cpu==2.15.0
-keras==2.15.0
+tensorflow==2.19.0
+keras==3.13.1
 gunicorn==21.2.0
 h5py==3.10.0
