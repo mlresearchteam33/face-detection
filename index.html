@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Face Detection AI</title>
+
+<style>
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  font-family:Arial, sans-serif;
+  background:#eef2ff;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+  padding:20px;
+}
+
+.container{
+  width:100%;
+  max-width:500px;
+  background:white;
+  border-radius:20px;
+  padding:30px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.1);
+}
+
+h1{
+  text-align:center;
+  margin-bottom:20px;
+  color:#3a56e8;
+}
+
+.upload-box{
+  border:2px dashed #3a56e8;
+  border-radius:15px;
+  padding:30px;
+  text-align:center;
+  cursor:pointer;
+  background:#f7f9ff;
+}
+
+.upload-box:hover{
+  background:#eef2ff;
+}
+
+#previewImage{
+  width:100%;
+  max-height:300px;
+  object-fit:cover;
+  border-radius:15px;
+  margin-top:20px;
+  display:none;
+}
+
+button{
+  width:100%;
+  margin-top:20px;
+  padding:15px;
+  border:none;
+  border-radius:12px;
+  background:#3a56e8;
+  color:white;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+button:hover{
+  background:#2742c7;
+}
+
+#resultBox{
+  margin-top:20px;
+  padding:20px;
+  border-radius:12px;
+  display:none;
+  text-align:center;
+  font-size:22px;
+  font-weight:bold;
+}
+
+.success{
+  background:#d1fae5;
+  color:#065f46;
+}
+
+.error{
+  background:#fee2e2;
+  color:#991b1b;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Face Detection AI</h1>
+
+<input type="file" id="fileInput" hidden accept="image/*">
+
+<div class="upload-box" id="uploadBox">
+  Click To Upload Image
+</div>
+
+<img id="previewImage">
+
+<button id="predictBtn">
+  Run Detection
+</button>
+
+<div id="resultBox"></div>
+
+</div>
+
+<script>
+
+const fileInput = document.getElementById("fileInput");
+const uploadBox = document.getElementById("uploadBox");
+const previewImage = document.getElementById("previewImage");
+const predictBtn = document.getElementById("predictBtn");
+const resultBox = document.getElementById("resultBox");
+
+let selectedFile = null;
+
+uploadBox.addEventListener("click", () => {
+  fileInput.click();
+});
+
+fileInput.addEventListener("change", () => {
+
+  if(fileInput.files.length > 0){
+
+    selectedFile = fileInput.files[0];
+
+    const reader = new FileReader();
+
+    reader.onload = function(e){
+
+      previewImage.src = e.target.result;
+
+      previewImage.style.display = "block";
+
+    };
+
+    reader.readAsDataURL(selectedFile);
+
+  }
+
+});
+
+predictBtn.addEventListener("click", async () => {
+
+  if(!selectedFile){
+
+    alert("Please upload image first");
+
+    return;
+
+  }
+
+  predictBtn.disabled = true;
+  predictBtn.innerText = "Processing...";
+
+  const formData = new FormData();
+
+  formData.append("file", selectedFile);
+
+  try{
+
+    const response = await fetch(
+      "/predict",
+      {
+        method:"POST",
+        body:formData
+      }
+    );
+
+    const data = await response.json();
+
+    resultBox.style.display = "block";
+
+    if(response.ok){
+
+      resultBox.className = "success";
+
+      resultBox.innerText = data.result;
+
+    }
+    else{
+
+      resultBox.className = "error";
+
+      resultBox.innerText = data.result;
+
+    }
+
+  }
+  catch(error){
+
+    console.log(error);
+
+    resultBox.style.display = "block";
+
+    resultBox.className = "error";
+
+    resultBox.innerText = "Cannot connect to Flask backend";
+
+  }
+
+  predictBtn.disabled = false;
+
+  predictBtn.innerText = "Run Detection";
+
+});
+
+</script>
+
+</body>
+</html>
