@@ -1,229 +1,797 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Face Detection AI</title>
-
+<title>Face Detection AI Pro</title>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
 
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
+:root {
+    --accent:        #6c63ff;
+    --accent-2:      #a78bfa;
+    --accent-glow:   rgba(108,99,255,0.35);
+    --green:         #10b981;
+    --green-2:       #34d399;
+    --radius-card:   22px;
+    --radius-shell:  18px;
+    --radius-img:    12px;
+    --radius-btn:    12px;
+    --radius-sm:     8px;
+    --transition:    0.28s cubic-bezier(0.4,0,0.2,1);
 }
 
-body{
-  font-family:Arial, sans-serif;
-  background:#eef2ff;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  min-height:100vh;
-  padding:20px;
+[data-theme="light"] {
+    --bg-page:          #eef0fb;
+    --bg-card:          #ffffff;
+    --bg-shell:         #181820;
+    --bg-upload:        #f5f6fe;
+    --bg-upload-hov:    #eceffe;
+    --bg-btn-secondary: #f0f1fb;
+    --bg-btn-clear:     #f4f4f8;
+    --bg-infobar:       #f0f1fb;
+    --border-upload:    rgba(108,99,255,0.35);
+    --text-h1:          #1a1c2e;
+    --text-muted:       #8a8fb5;
+    --text-btn-sec:     #4a4e72;
+    --text-btn-clr:     #8a8fb5;
+    --res-ok-bg:        #ecfdf5; --res-ok-fg:  #065f46;
+    --res-err-bg:       #fef2f2; --res-err-fg: #991b1b;
+    --res-load-bg:      #eff6ff; --res-load-fg:#1e40af;
+    --bar-track:        rgba(0,0,0,0.08);
+    --toggle-bg:        rgba(108,99,255,0.10);
+    --card-shadow:      0 2px 8px rgba(108,99,255,0.08), 0 12px 40px rgba(80,80,180,0.10);
+    --infobar-border:   rgba(108,99,255,0.12);
 }
 
-.container{
-  width:100%;
-  max-width:500px;
-  background:white;
-  border-radius:20px;
-  padding:30px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.1);
+[data-theme="dark"] {
+    --bg-page:          #0c0d18;
+    --bg-card:          #12141f;
+    --bg-shell:         #07080f;
+    --bg-upload:        #181a2a;
+    --bg-upload-hov:    #1e2035;
+    --bg-btn-secondary: #1c1e30;
+    --bg-btn-clear:     #181a28;
+    --bg-infobar:       #181a2a;
+    --border-upload:    rgba(108,99,255,0.28);
+    --text-h1:          #e8eaf8;
+    --text-muted:       #565880;
+    --text-btn-sec:     #9396b8;
+    --text-btn-clr:     #565880;
+    --res-ok-bg:        rgba(16,185,129,0.09); --res-ok-fg:  #34d399;
+    --res-err-bg:       rgba(239,68,68,0.09);  --res-err-fg: #f87171;
+    --res-load-bg:      rgba(99,102,241,0.09); --res-load-fg:#818cf8;
+    --bar-track:        rgba(255,255,255,0.07);
+    --toggle-bg:        rgba(255,255,255,0.05);
+    --card-shadow:      0 2px 8px rgba(0,0,0,0.4), 0 16px 48px rgba(0,0,0,0.5);
+    --infobar-border:   rgba(108,99,255,0.1);
 }
 
-h1{
-  text-align:center;
-  margin-bottom:20px;
-  color:#3a56e8;
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg-page);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: clamp(14px, 3vw, 36px) clamp(10px, 2.5vw, 20px);
+    transition: background var(--transition);
 }
 
-.upload-box{
-  border:2px dashed #3a56e8;
-  border-radius:15px;
-  padding:30px;
-  text-align:center;
-  cursor:pointer;
-  background:#f7f9ff;
+.container {
+    width: 100%;
+    max-width: 980px;
+    background: var(--bg-card);
+    border-radius: var(--radius-card);
+    box-shadow: var(--card-shadow);
+    padding: clamp(20px, 3.5vw, 40px);
+    transition: background var(--transition), box-shadow var(--transition);
 }
 
-.upload-box:hover{
-  background:#eef2ff;
+.header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 28px;
+}
+.header-left { flex: 1; min-width: 0; }
+
+h1 {
+    font-size: clamp(20px, 3vw, 28px);
+    font-weight: 700;
+    color: var(--text-h1);
+    letter-spacing: -0.6px;
+    line-height: 1.2;
+    transition: color var(--transition);
+}
+h1 .accent { color: var(--accent); }
+
+.subtitle {
+    margin-top: 5px;
+    font-size: 13px;
+    color: var(--text-muted);
+    transition: color var(--transition);
 }
 
-#previewImage{
-  width:100%;
-  max-height:300px;
-  object-fit:cover;
-  border-radius:15px;
-  margin-top:20px;
-  display:none;
+.theme-toggle {
+    flex-shrink: 0;
+    width: 40px; height: 40px;
+    border: none; border-radius: 10px;
+    background: var(--toggle-bg);
+    cursor: pointer; font-size: 17px;
+    display: grid; place-items: center;
+    transition: transform 0.2s, background var(--transition);
+}
+.theme-toggle:hover { transform: scale(1.1); }
+
+.upload-box {
+    border: 2px dashed var(--border-upload);
+    border-radius: 16px;
+    padding: clamp(28px, 6vw, 52px) 20px;
+    text-align: center;
+    cursor: pointer;
+    background: var(--bg-upload);
+    transition: background var(--transition), border-color var(--transition), transform 0.15s;
+}
+.upload-box:hover     { background: var(--bg-upload-hov); }
+.upload-box.drag-over { background: var(--bg-upload-hov); border-color: var(--accent); transform: scale(1.01); }
+
+.upload-icon  { font-size: 42px; display: block; margin-bottom: 10px; }
+.upload-label { font-size: 15px; font-weight: 600; color: var(--text-h1); transition: color var(--transition); }
+.upload-hint  { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+.preview-section { display: none; margin-top: 24px; }
+.preview-section.active { display: block; }
+
+.section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    transition: color var(--transition);
 }
 
-button{
-  width:100%;
-  margin-top:20px;
-  padding:15px;
-  border:none;
-  border-radius:12px;
-  background:#3a56e8;
-  color:white;
-  font-size:16px;
-  font-weight:bold;
-  cursor:pointer;
+.editor-workspace {
+    background: var(--bg-shell);
+    border-radius: var(--radius-shell);
+    box-shadow:
+        inset 0 0 0 1px rgba(108,99,255,0.20),
+        0 4px 32px rgba(0,0,0,0.30);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(10px, 2vw, 20px);
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    transition: box-shadow var(--transition), max-width var(--transition);
 }
 
-button:hover{
-  background:#2742c7;
+.editor-workspace::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.035) 1px, transparent 1px);
+    background-size: 20px 20px;
+    pointer-events: none;
+    z-index: 0;
 }
 
-#resultBox{
-  margin-top:20px;
-  padding:20px;
-  border-radius:12px;
-  display:none;
-  text-align:center;
-  font-size:22px;
-  font-weight:bold;
+.img-wrap {
+    position: relative;
+    display: inline-block;
+    line-height: 0;
+    z-index: 1;
+    cursor: crosshair;
+    filter: drop-shadow(0 6px 28px rgba(0,0,0,0.50));
+    transition: filter 0.3s;
+    max-width: 100%;
+}
+.img-wrap:hover { filter: drop-shadow(0 8px 36px rgba(0,0,0,0.65)); }
+
+#cropImage {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 75vh;
+    user-select: none;
+    pointer-events: none;
+    -webkit-user-drag: none;
+    border-radius: var(--radius-img);
 }
 
-.success{
-  background:#d1fae5;
-  color:#065f46;
+#overlayCanvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    cursor: crosshair;
+    touch-action: none;
+    border-radius: var(--radius-img);
 }
 
-.error{
-  background:#fee2e2;
-  color:#991b1b;
+.info-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+    padding: 9px 14px;
+    background: var(--bg-infobar);
+    border: 1px solid var(--infobar-border);
+    border-radius: var(--radius-sm);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    transition: background var(--transition), border-color var(--transition);
+}
+.info-bar .val { color: var(--accent); font-weight: 600; }
+.info-badge {
+    background: rgba(108,99,255,0.12);
+    color: var(--accent);
+    padding: 2px 8px; border-radius: 5px;
+    font-weight: 700; font-size: 10px;
+    letter-spacing: 0.5px;
 }
 
+.btn-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+button {
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: var(--radius-btn);
+    transition: transform 0.18s, box-shadow 0.18s, opacity 0.18s, background var(--transition);
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+button:disabled { opacity: .42; cursor: not-allowed; }
+button:hover:not(:disabled) { transform: translateY(-2px); }
+button:active:not(:disabled) { transform: translateY(0px); }
+
+#cropBtn {
+    flex: 1;
+    padding: 13px 18px;
+    font-size: 14px;
+    background: linear-gradient(135deg, var(--accent) 0%, #8b5cf6 100%);
+    color: #fff;
+    box-shadow: 0 4px 18px var(--accent-glow);
+}
+#cropBtn:hover:not(:disabled) { box-shadow: 0 6px 24px var(--accent-glow); }
+
+#resetCropBtn {
+    flex-shrink: 0;
+    padding: 13px 16px;
+    font-size: 14px;
+    background: var(--bg-btn-secondary);
+    color: var(--text-btn-sec);
+}
+
+#predictBtn {
+    width: 100%;
+    padding: 16px;
+    font-size: 15px;
+    margin-top: 18px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(16,185,129,0.28);
+    letter-spacing: 0.1px;
+}
+#predictBtn:hover:not(:disabled) { box-shadow: 0 6px 28px rgba(16,185,129,0.38); }
+
+#clearBtn {
+    width: 100%;
+    padding: 11px;
+    font-size: 13px;
+    margin-top: 9px;
+    background: var(--bg-btn-clear);
+    color: var(--text-btn-clr);
+}
+
+.result-box {
+    display: none;
+    margin-top: 22px;
+    padding: 20px 22px;
+    border-radius: 16px;
+    transition: background var(--transition), color var(--transition);
+}
+.result-box.active { display: block; }
+.success { background: var(--res-ok-bg);   color: var(--res-ok-fg);   border: 1px solid rgba(16,185,129,0.18); }
+.error   { background: var(--res-err-bg);  color: var(--res-err-fg);  border: 1px solid rgba(239,68,68,0.18); }
+.loading { background: var(--res-load-bg); color: var(--res-load-fg); border: 1px solid rgba(99,102,241,0.18); }
+
+.result-title   { font-size: 16px; font-weight: 700; margin-bottom: 6px; letter-spacing: -0.2px; }
+.result-message { font-size: 13.5px; word-break: break-word; opacity: .9; }
+
+.prob-section { margin-top: 16px; display: flex; flex-direction: column; gap: 12px; }
+.prob-row { display: flex; flex-direction: column; gap: 5px; }
+.prob-label-row {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 12.5px; font-weight: 600;
+}
+.prob-track {
+    width: 100%; height: 8px; border-radius: 99px;
+    background: var(--bar-track); overflow: hidden;
+}
+.prob-fill {
+    height: 100%; border-radius: 99px; width: 0%;
+    transition: width 1s cubic-bezier(0.4,0,0.2,1);
+}
+.prob-fill.human    { background: linear-gradient(90deg, #10b981, #34d399); }
+.prob-fill.nonhuman { background: linear-gradient(90deg, #f43f5e, #fb923c); }
+
+.debug-chip {
+    display: inline-block; margin-top: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px; padding: 3px 9px;
+    border-radius: 6px; background: var(--bar-track); color: var(--text-muted);
+}
+
+@media (max-width: 580px) {
+    .btn-row { flex-direction: column; }
+}
 </style>
 </head>
-
 <body>
 
 <div class="container">
 
-<h1>Face Detection AI</h1>
+    <div class="header">
+        <div class="header-left">
+            <h1>🎯 Face Detection <span class="accent">AI</span></h1>
+            <div class="subtitle">Upload → Crop HD image → Detect faces with precision</div>
+        </div>
+        <button class="theme-toggle" id="themeToggle" title="Toggle theme">☀️</button>
+    </div>
 
-<input type="file" id="fileInput" hidden accept="image/*">
+    <input type="file" id="fileInput" accept="image/*" hidden>
 
-<div class="upload-box" id="uploadBox">
-  Click To Upload Image
-</div>
+    <div class="upload-box" id="uploadBox">
+        <span class="upload-icon">📸</span>
+        <div class="upload-label">Click to upload — or drag &amp; drop</div>
+        <div class="upload-hint">PNG · JPG · WEBP · any orientation · any size</div>
+    </div>
 
-<img id="previewImage">
+    <div class="preview-section" id="previewSection">
 
-<button id="predictBtn">
-  Run Detection
-</button>
+        <div class="section-label">✂️ Crop Workspace — drag to select region</div>
 
-<div id="resultBox"></div>
+        <div class="editor-workspace" id="editorWorkspace">
+            <div class="img-wrap" id="imgWrap">
+                <img id="cropImage" alt="Preview">
+                <canvas id="overlayCanvas"></canvas>
+            </div>
+        </div>
+
+        <div class="info-bar">
+            <div id="imgDimInfo">No image loaded</div>
+            <div id="selDimInfo">No selection</div>
+            <div id="orientBadge" class="info-badge" style="display:none"></div>
+        </div>
+
+        <div class="btn-row" id="cropButtonGroup" style="display:none;">
+            <button id="cropBtn">✓ Apply HD Crop</button>
+            <button id="resetCropBtn">↺ Reset</button>
+        </div>
+
+        <button id="predictBtn">🚀 Run Face Detection</button>
+        <button id="clearBtn">🔄 Clear &amp; Start Over</button>
+
+    </div>
+
+    <div class="result-box" id="resultBox"></div>
 
 </div>
 
 <script>
+'use strict';
 
-const fileInput = document.getElementById("fileInput");
-const uploadBox = document.getElementById("uploadBox");
-const previewImage = document.getElementById("previewImage");
-const predictBtn = document.getElementById("predictBtn");
-const resultBox = document.getElementById("resultBox");
+const API_URL = 'https://face-detection-4c3g.onrender.com';
 
-let selectedFile = null;
+const themeToggle    = document.getElementById('themeToggle');
+const html           = document.documentElement;
+const savedTheme     = localStorage.getItem('fd-theme') || 'light';
+html.setAttribute('data-theme', savedTheme);
+themeToggle.textContent = savedTheme === 'dark' ? '🌙' : '☀️';
 
-uploadBox.addEventListener("click", () => {
-  fileInput.click();
+themeToggle.addEventListener('click', () => {
+    const next = html.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    html.setAttribute('data-theme', next);
+    themeToggle.textContent = next === 'dark' ? '🌙' : '☀️';
+    localStorage.setItem('fd-theme', next);
 });
 
-fileInput.addEventListener("change", () => {
+const fileInput       = document.getElementById('fileInput');
+const uploadBox       = document.getElementById('uploadBox');
+const previewSection  = document.getElementById('previewSection');
+const editorWorkspace = document.getElementById('editorWorkspace');
+const imgWrap         = document.getElementById('imgWrap');
+const cropImage       = document.getElementById('cropImage');
+const overlayCanvas   = document.getElementById('overlayCanvas');
+const ctx             = overlayCanvas.getContext('2d');
+const cropButtonGroup = document.getElementById('cropButtonGroup');
+const cropBtn         = document.getElementById('cropBtn');
+const resetCropBtn    = document.getElementById('resetCropBtn');
+const predictBtn      = document.getElementById('predictBtn');
+const clearBtn        = document.getElementById('clearBtn');
+const resultBox       = document.getElementById('resultBox');
+const imgDimInfo      = document.getElementById('imgDimInfo');
+const selDimInfo      = document.getElementById('selDimInfo');
+const orientBadge     = document.getElementById('orientBadge');
 
-  if(fileInput.files.length > 0){
+let originalImage = new Image();
+let selectedFile  = null;
+let croppedBlob   = null;
+let sel      = { x:0, y:0, w:0, h:0, active:false };
+let dragging = false;
+let rafId    = null;
 
-    selectedFile = fileInput.files[0];
+function classifyOrientation(img) {
+    const r = img.naturalWidth / img.naturalHeight;
+    if (r < 0.85)  return 'portrait';
+    if (r > 1.15)  return 'landscape';
+    return 'square';
+}
 
-    const reader = new FileReader();
+function applyOrientationSizing(img) {
+    const orient = classifyOrientation(img);
+    const vw     = window.innerWidth;
+    const vh     = window.innerHeight;
 
-    reader.onload = function(e){
+    imgWrap.classList.remove('portrait', 'landscape', 'square');
+    imgWrap.classList.add(orient);
 
-      previewImage.src = e.target.result;
+    orientBadge.style.display = '';
+    orientBadge.textContent   = orient.toUpperCase();
 
-      previewImage.style.display = "block";
+    let maxH, maxW, workspaceMaxW;
 
+    if (vw <= 580) {
+        maxH = Math.min(Math.round(vh * (orient === 'landscape' ? 0.55 : orient === 'square' ? 0.70 : 0.78)), orient === 'landscape' ? 380 : orient === 'square' ? 520 : 640);
+        maxW = '100%';
+        workspaceMaxW = '100%';
+    } else {
+        if (orient === 'portrait') {
+            maxH = Math.min(Math.round(vh * 0.82), 840);
+            maxW = 'none';
+            const renderedW = Math.round((img.naturalWidth / img.naturalHeight) * maxH);
+            workspaceMaxW = Math.min(renderedW + 40, vw - 80) + 'px';
+        } else if (orient === 'landscape') {
+            maxH = Math.min(Math.round(vh * 0.72), 680);
+            maxW = '100%';
+            workspaceMaxW = '100%';
+        } else {
+            maxH = Math.min(Math.round(vh * 0.74), 720);
+            maxW = '100%';
+            workspaceMaxW = '100%';
+        }
+    }
+
+    cropImage.style.maxHeight = maxH + 'px';
+    cropImage.style.maxWidth  = maxW === 'none' ? 'none' : maxW;
+    cropImage.style.width     = 'auto';
+    cropImage.style.height    = 'auto';
+
+    editorWorkspace.style.maxWidth    = workspaceMaxW;
+    editorWorkspace.style.marginLeft  = 'auto';
+    editorWorkspace.style.marginRight = 'auto';
+}
+
+function imgRect() {
+    return cropImage.getBoundingClientRect();
+}
+
+function viewportToHD(clientX, clientY) {
+    const r  = imgRect();
+    const rx = Math.min(1, Math.max(0, (clientX - r.left) / r.width));
+    const ry = Math.min(1, Math.max(0, (clientY - r.top)  / r.height));
+    return {
+        x: rx * originalImage.naturalWidth,
+        y: ry * originalImage.naturalHeight,
     };
+}
 
+function syncCanvasResolution() {
+    const r   = imgRect();
+    const dpr = window.devicePixelRatio || 1;
+    overlayCanvas.width  = Math.round(r.width  * dpr);
+    overlayCanvas.height = Math.round(r.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+function scheduleDraw() {
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(drawOverlay);
+}
+
+function drawOverlay() {
+    rafId = null;
+    const r = imgRect();
+    const W = r.width;
+    const H = r.height;
+
+    ctx.clearRect(0, 0, W, H);
+    if (!sel.active || sel.w === 0 || sel.h === 0) return;
+
+    const scaleX = W / originalImage.naturalWidth;
+    const scaleY = H / originalImage.naturalHeight;
+    const dx = sel.x * scaleX;
+    const dy = sel.y * scaleY;
+    const dw = sel.w * scaleX;
+    const dh = sel.h * scaleY;
+
+    ctx.fillStyle = 'rgba(0,0,0,0.58)';
+    ctx.fillRect(0,     0,     W,        dy);
+    ctx.fillRect(0,     dy,    dx,       dh);
+    ctx.fillRect(dx+dw, dy,    W-(dx+dw),dh);
+    ctx.fillRect(0,     dy+dh, W,        H-(dy+dh));
+
+    ctx.save();
+    ctx.shadowColor = 'rgba(108,99,255,0.75)';
+    ctx.shadowBlur  = 14;
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth   = 2;
+    ctx.strokeRect(dx, dy, dw, dh);
+    ctx.restore();
+
+    ctx.strokeStyle = 'rgba(255,255,255,0.30)';
+    ctx.lineWidth   = 1;
+    ctx.strokeRect(dx+2, dy+2, dw-4, dh-4);
+
+    ctx.strokeStyle = 'rgba(255,255,255,0.14)';
+    ctx.lineWidth   = 0.75;
+    for (let i = 1; i < 3; i++) {
+        ctx.beginPath(); ctx.moveTo(dx + dw*i/3, dy);   ctx.lineTo(dx + dw*i/3, dy+dh); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(dx, dy + dh*i/3);   ctx.lineTo(dx+dw, dy + dh*i/3); ctx.stroke();
+    }
+
+    const HL = 18, HT = 3;
+    ctx.save();
+    ctx.shadowColor = 'rgba(108,99,255,0.95)';
+    ctx.shadowBlur  = 10;
+    ctx.fillStyle   = '#ffffff';
+    [[dx, dy, +1, +1], [dx+dw, dy, -1, +1], [dx, dy+dh, +1, -1], [dx+dw, dy+dh, -1, -1]].forEach(([cx, cy, sx, sy]) => {
+        ctx.fillRect(cx, cy, sx*HL, sy*HT);
+        ctx.fillRect(cx, cy, sx*HT, sy*HL);
+    });
+    ctx.restore();
+
+    const mx = dx + dw/2, my = dy + dh/2;
+    ctx.strokeStyle = 'rgba(255,255,255,0.38)';
+    ctx.lineWidth   = 1;
+    ctx.beginPath(); ctx.moveTo(mx-9, my); ctx.lineTo(mx+9, my); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(mx, my-9); ctx.lineTo(mx, my+9); ctx.stroke();
+
+    const label = `${Math.round(sel.w)} × ${Math.round(sel.h)}`;
+    ctx.font = '600 11px JetBrains Mono, monospace';
+    const tw = ctx.measureText(label).width;
+    const lx = dx + dw - tw - 18;
+    const ly = dy + dh - 24;
+    ctx.fillStyle = 'rgba(0,0,0,0.56)';
+    if (ctx.roundRect) {
+        ctx.beginPath(); ctx.roundRect(lx-4, ly-2, tw+12, 19, 4); ctx.fill();
+    } else {
+        ctx.fillRect(lx-4, ly-2, tw+12, 19);
+    }
+    ctx.fillStyle = '#fff';
+    ctx.fillText(label, lx+2, ly+12);
+
+    selDimInfo.innerHTML = `Sel: <span class="val">${Math.round(sel.w)} × ${Math.round(sel.h)} px</span>`;
+}
+
+overlayCanvas.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    overlayCanvas.setPointerCapture(e.pointerId);
+    const p = viewportToHD(e.clientX, e.clientY);
+    sel = { x:p.x, y:p.y, w:0, h:0, active:true };
+    dragging = true;
+    cropButtonGroup.style.display = 'none';
+    scheduleDraw();
+});
+
+overlayCanvas.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    e.preventDefault();
+    const p = viewportToHD(e.clientX, e.clientY);
+    sel.w = p.x - sel.x;
+    sel.h = p.y - sel.y;
+    scheduleDraw();
+});
+
+overlayCanvas.addEventListener('pointerup', () => {
+    if (!dragging) return;
+    dragging = false;
+
+    if (sel.w < 0) { sel.x += sel.w; sel.w = -sel.w; }
+    if (sel.h < 0) { sel.y += sel.h; sel.h = -sel.h; }
+
+    sel.x = Math.max(0, Math.min(sel.x, originalImage.naturalWidth));
+    sel.y = Math.max(0, Math.min(sel.y, originalImage.naturalHeight));
+    sel.w = Math.min(sel.w, originalImage.naturalWidth  - sel.x);
+    sel.h = Math.min(sel.h, originalImage.naturalHeight - sel.y);
+
+    if (sel.w > 5 && sel.h > 5) {
+        cropButtonGroup.style.display = 'flex';
+    } else {
+        sel.active = false;
+        cropButtonGroup.style.display = 'none';
+        selDimInfo.textContent = 'No selection';
+    }
+    scheduleDraw();
+});
+
+overlayCanvas.addEventListener('pointercancel', () => { dragging = false; });
+
+const ro = new ResizeObserver(() => {
+    if (!originalImage.naturalWidth) return;
+    syncCanvasResolution();
+    scheduleDraw();
+});
+ro.observe(imgWrap);
+
+window.addEventListener('resize', () => {
+    if (!originalImage.naturalWidth) return;
+    applyOrientationSizing(originalImage);
+    requestAnimationFrame(() => { syncCanvasResolution(); scheduleDraw(); });
+}, { passive: true });
+
+uploadBox.addEventListener('click', () => fileInput.click());
+uploadBox.addEventListener('dragover',  e => { e.preventDefault(); uploadBox.classList.add('drag-over'); });
+uploadBox.addEventListener('dragleave', ()  => uploadBox.classList.remove('drag-over'));
+uploadBox.addEventListener('drop', e => {
+    e.preventDefault();
+    uploadBox.classList.remove('drag-over');
+    const f = e.dataTransfer.files[0];
+    if (f && f.type.startsWith('image/')) handleFile(f);
+});
+
+fileInput.addEventListener('change', () => {
+    if (fileInput.files.length) handleFile(fileInput.files[0]);
+});
+
+function handleFile(file) {
+    selectedFile = file;
+    croppedBlob  = null;
+    const reader = new FileReader();
+    reader.onload = e => loadImage(e.target.result, true);
+    reader.readAsDataURL(file);
+}
+
+function loadImage(src, resetSel = false) {
+    const img = new Image();
+    img.onload = () => {
+        originalImage = img;
+        if (resetSel) {
+            sel = { x:0, y:0, w:0, h:0, active:false };
+            selDimInfo.textContent = 'No selection';
+            cropButtonGroup.style.display = 'none';
+        }
+        setupCropper(src, img);
+    };
+    img.src = src;
+}
+
+function setupCropper(src, img) {
+    previewSection.classList.add('active');
+    imgDimInfo.innerHTML = `Image: <span class="val">${img.naturalWidth} × ${img.naturalHeight} px</span>`;
+
+    cropImage.onload = () => {
+        applyOrientationSizing(img);
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+            syncCanvasResolution();
+            scheduleDraw();
+        }));
+    };
+    cropImage.src = src;
+}
+
+cropBtn.addEventListener('click', () => {
+    if (!sel.active || sel.w < 5 || sel.h < 5) {
+        showResult('Please draw a crop area first.', 'error');
+        return;
+    }
+
+    const cx = Math.max(0, Math.round(sel.x));
+    const cy = Math.max(0, Math.round(sel.y));
+    const cw = Math.min(Math.round(sel.w), originalImage.naturalWidth  - cx);
+    const ch = Math.min(Math.round(sel.h), originalImage.naturalHeight - cy);
+
+    const hd   = document.createElement('canvas');
+    hd.width   = cw;
+    hd.height  = ch;
+    const hctx = hd.getContext('2d');
+    hctx.imageSmoothingEnabled = true;
+    hctx.imageSmoothingQuality = 'high';
+    hctx.drawImage(originalImage, cx, cy, cw, ch, 0, 0, cw, ch);
+
+    loadImage(hd.toDataURL('image/png', 1.0), true);
+
+    hd.toBlob(blob => {
+        croppedBlob = blob;
+        showResult(`✅ HD crop applied — ${cw} × ${ch} px`, 'success');
+    }, 'image/png', 1.0);
+});
+
+resetCropBtn.addEventListener('click', () => {
+    croppedBlob = null;
+    const reader = new FileReader();
+    reader.onload = e => loadImage(e.target.result, true);
     reader.readAsDataURL(selectedFile);
-
-  }
-
+    showResult('Reset to original image.', 'loading');
 });
 
-predictBtn.addEventListener("click", async () => {
-
-  if(!selectedFile){
-
-    alert("Please upload image first");
-
-    return;
-
-  }
-
-  predictBtn.disabled = true;
-  predictBtn.innerText = "Processing...";
-
-  const formData = new FormData();
-
-  formData.append("file", selectedFile);
-
-  try{
-
-    const response = await fetch(
-      "https://face-detection-4c3g.onrender.com/predict",
-      {
-        method:"POST",
-        body:formData
-      }
-    );
-
-    const data = await response.json();
-
-    resultBox.style.display = "block";
-
-    if(response.ok){
-
-      resultBox.className = "success";
-
-      resultBox.innerText = data.result;
-
+predictBtn.addEventListener('click', async () => {
+    if (!selectedFile) { showResult('Upload an image first.', 'error'); return; }
+    predictBtn.disabled = true;
+    showResult('Analyzing image…', 'loading');
+    try {
+        const fd = new FormData();
+        fd.append('file', croppedBlob ?? selectedFile, croppedBlob ? 'cropped.png' : selectedFile.name);
+        const res  = await fetch(`${API_URL}/predict`, { method: 'POST', body: fd });
+        const data = await res.json();
+        res.ok ? showResult(data.result, 'success', data) : showResult(data.result || 'Prediction failed.', 'error');
+    } catch {
+        showResult('Cannot reach the server. Please try again later.', 'error');
+    } finally {
+        predictBtn.disabled = false;
     }
-    else{
-
-      resultBox.className = "error";
-
-      resultBox.innerText = data.result;
-
-    }
-
-  }
-  catch(error){
-
-    console.log(error);
-
-    resultBox.style.display = "block";
-
-    resultBox.className = "error";
-
-    resultBox.innerText = "Cannot connect to Flask backend";
-
-  }
-
-  predictBtn.disabled = false;
-
-  predictBtn.innerText = "Run Detection";
-
 });
 
+clearBtn.addEventListener('click', () => {
+    fileInput.value               = '';
+    selectedFile                  = null;
+    croppedBlob                   = null;
+    originalImage                 = new Image();
+    sel.active                    = false;
+    previewSection.classList.remove('active');
+    resultBox.classList.remove('active');
+    cropButtonGroup.style.display     = 'none';
+    editorWorkspace.style.maxWidth    = '';
+    editorWorkspace.style.marginLeft  = '';
+    editorWorkspace.style.marginRight = '';
+});
+
+function showResult(message, type, data) {
+    const icon = type === 'success' ? '✅ Detection Complete'
+               : type === 'error'   ? '❌ Error'
+               :                      '⏳ Processing';
+
+    let probHTML = '';
+    if (type === 'success' && data?.distance !== undefined) {
+        const hp = data.human_percent;
+        const np = data.nonhuman_percent;
+        probHTML = `
+        <div class="prob-section">
+            <div class="prob-row">
+                <div class="prob-label-row"><span>👤 Human Face</span><strong>${hp.toFixed(1)}%</strong></div>
+                <div class="prob-track"><div class="prob-fill human" data-target="${hp.toFixed(1)}"></div></div>
+            </div>
+            <div class="prob-row">
+                <div class="prob-label-row"><span>🚫 Not Human</span><strong>${np.toFixed(1)}%</strong></div>
+                <div class="prob-track"><div class="prob-fill nonhuman" data-target="${np.toFixed(1)}"></div></div>
+            </div>
+            <span class="debug-chip">distance: ${parseFloat(data.distance).toFixed(4)} / threshold: ${parseFloat(data.threshold).toFixed(4)}</span>
+        </div>`;
+    }
+
+    resultBox.className = `result-box active ${type}`;
+    resultBox.innerHTML = `<div class="result-title">${icon}</div><div class="result-message">${message}</div>${probHTML}`;
+
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+        resultBox.querySelectorAll('.prob-fill').forEach(b => { b.style.width = b.dataset.target + '%'; });
+    }));
+}
 </script>
-
 </body>
 </html>
